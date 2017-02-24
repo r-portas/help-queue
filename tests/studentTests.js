@@ -7,6 +7,8 @@ const assert = chai.assert;
 
 let student;
 
+const date = new Date();
+
 describe('Student', () => {
   beforeEach(() => {
     student = new Student('Jane', 1234, 1);
@@ -27,5 +29,11 @@ describe('Student', () => {
   it('should set correct priority', () => {
     student.setPriority(2);
     assert.equal(student.getPriority(), 2);
+  });
+
+  it('should have correct date', () => {
+    student.setDate(date);
+
+    assert.equal(student.getDate(), date);
   });
 });

@@ -13,6 +13,13 @@ class PriorityQueue {
   }
 
   /**
+   * Returns the name of the queue
+   */
+  getName() {
+    return this.name;
+  }
+
+  /**
    * Enqueues an item
    */
   add(newItem) {
@@ -21,12 +28,14 @@ class PriorityQueue {
       if (newItem.getPriority() < item.getPriority()) {
         // Add the item into the position
         this.items.splice(i, 0, newItem);
+        newItem.setDate();
         return;
       }
     }
 
     // Else add it to the end
     this.items.push(newItem);
+    newItem.setDate();
   }
 
   /**
@@ -79,6 +88,13 @@ class PriorityQueue {
    */
   size() {
     return this.items.length;
+  }
+
+  /**
+   * Returns an array representation of the queue
+   */
+  getArray() {
+    return this.items.slice();
   }
 
   /**

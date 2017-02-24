@@ -22,6 +22,10 @@ describe('Priority Queue', () => {
     priorityQueue = new PriorityQueue('test queue');
   });
 
+  it('should have correct name', () => {
+    assert.equal(priorityQueue.getName(), 'test queue');
+  });
+
   it('should start empty', () => {
     assert.equal(priorityQueue.size(), 0);
   });
@@ -86,5 +90,49 @@ describe('Priority Queue', () => {
     }
 
     assert.equal(priorityQueue.size(), 0);
+  });
+
+  it('correctly clears the queue', () => {
+    priorityQueue.add(students[0]);
+    priorityQueue.add(students[1]);
+
+    assert.equal(priorityQueue.size(), 2);
+
+    priorityQueue.clear();
+
+    assert.equal(priorityQueue.size(), 0);
+  });
+
+  it('correctly removes a student', () => {
+    priorityQueue.add(students[0]);
+    priorityQueue.add(students[1]);
+
+    priorityQueue.remove(students[1]);
+
+    assert.equal(priorityQueue.size(), 1);
+    assert.isTrue(priorityQueue.contains(students[0]));
+    assert.isNotTrue(priorityQueue.contains(students[1]));
+  });
+
+
+  it('getArray() should contain the added items', () => {
+    priorityQueue.add(students[0]);
+    priorityQueue.add(students[1]);
+
+    const itemArray = priorityQueue.getArray();
+    assert.isTrue(itemArray.includes(students[0]));
+    assert.isTrue(itemArray.includes(students[1]));
+  });
+
+  it('getArray() should return a readonly copy of the queue', () => {
+    priorityQueue.add(students[0]);
+    priorityQueue.add(students[1]);
+
+    const itemArray = priorityQueue.getArray();
+
+    itemArray.shift();
+
+    assert.equal(itemArray.length, 1);
+    assert.equal(priorityQueue.size(), 2);
   });
 });
