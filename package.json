@@ -1,0 +1,30 @@
+{
+  "name": "help-queue",
+  "version": "1.0.0",
+  "description": "A help queue system",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests/*.js",
+    "lint": "eslint index.js controllers/*.js models/*.js tests/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/r-portas/help-queue.git"
+  },
+  "author": "Roy Portas <royportas@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/r-portas/help-queue/issues"
+  },
+  "homepage": "https://github.com/r-portas/help-queue#readme",
+  "dependencies": {
+    "chai": "^3.5.0",
+    "express": "^4.14.1",
+    "mocha": "^3.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.16.1",
+    "eslint-config-airbnb-base": "^11.1.0",
+    "eslint-plugin-import": "^2.2.0"
+  }
+}
