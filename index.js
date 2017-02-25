@@ -4,49 +4,53 @@
  * @author Roy Portas <royportas@gmail.com>
  */
 
-const PriorityQueue = require('./models/priorityQueue');
-const Student = require('./models/student.js');
+const express = require('express');
+const session = require('express-session');
+const sharedsession = require('express-socket.io-session');
 
-const queue = new PriorityQueue('Quick Questions');
+const app = express();
+const http = require('http').Server(app);
 
-const s1 = new Student('Bob', 100, 1);
-const s2 = new Student('Alice', 101, 2);
-const s3 = new Student('Jane', 102, 3);
-const s4 = new Student('James', 103, 2);
-const s5 = new Student('Frank', 104, 1);
-const s6 = new Student('Michelle', 105, 3);
+const io = require('socket.io')(http);
 
-queue.print();
+const port = process.env.PORT || 3000;
 
-queue.add(s1);
-queue.print();
+const sess = session({
+  secret: 'Super Secret Session',
+  resave: true,
+  saveUnitialized: true
+});
+app.use(sess);
 
-queue.add(s3);
-queue.print();
+app.use(express.static('public'));
 
-console.log('Queue contains:', queue.contains(s2));
+/**
+ * Returns the user data, used by the client
+ */
+app.get('/user', (req, res) => {
+  res.json(req.session);
+});
 
-queue.add(s2);
-queue.print();
+app.get('/user/:username', (req, res) => {
+  const userSession = req.session;
+  userSession.username = req.params.username;
+  res.send(200);
+});
 
-console.log('Queue contains:', queue.contains(s2));
+io.use(sharedsession(sess, {
+  autoSave: true
+}));
 
-queue.add(s4);
-queue.print();
+io.on('connection', (socket) => {
+  console.log('User connected');
 
-queue.add(s5);
-queue.print();
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
 
-queue.add(s6);
-queue.print();
+  socket.on('requestHelp', () => {
+    console.log(`${socket.handshake.session.username} requested help`);
+  });
+});
 
-const item = queue.poll();
-console.log('Retrieved item:', item);
-queue.print();
-
-queue.remove(s3);
-queue.print();
-
-queue.clear();
-queue.print();
-
+http.listen(port, () => console.log(`Help queue running on port ${port}`));
