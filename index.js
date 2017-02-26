@@ -4,9 +4,14 @@
  * @author Roy Portas <royportas@gmail.com>
  */
 
+const SSO_ENABLED = true;
+
 const express = require('express');
 const session = require('express-session');
 const sharedsession = require('express-socket.io-session');
+const cookieParser = require('cookie-parser');
+const sso = require('uqsso');
+
 const Student = require('./models/student');
 const QueueController = require('./controllers/queueController');
 
@@ -30,23 +35,24 @@ const sess = session({
   secret: 'Super Secret Session',
   resave: true
 });
-app.use(sess);
 
+app.use(sess);
 app.use(express.static('public'));
+
+if (SSO_ENABLED) {
+  app.use(cookieParser());
+
+  sso.public('^/$');
+  app.use(sso);
+}
 
 /**
  * Returns the user data, used by the client
  */
 app.get('/user', (req, res) => {
-  // TODO: Remove testing code
-  /**
-  if (req.session.student == null ) {
-    const student = new Student(new Date().getTime(), new Date().getTime(), 1);
-    req.session.student = student;
-
-    students[student.getStudentNumber()] = student;
+  if (SSO_ENABLED) {
+    console.log(req.user);
   }
-  */
 
   res.json(req.session);
 });
