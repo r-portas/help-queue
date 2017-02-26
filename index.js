@@ -39,14 +39,22 @@ app.use(express.static('public'));
  */
 app.get('/user', (req, res) => {
   // TODO: Remove testing code
-  if (req.session.student == null) {
+  /**
+  if (req.session.student == null ) {
     const student = new Student(new Date().getTime(), new Date().getTime(), 1);
     req.session.student = student;
 
     students[student.getStudentNumber()] = student;
   }
+  */
 
   res.json(req.session);
+});
+
+app.get('/user/staff/:name', (req, res) => {
+  const userSession = req.session;
+  userSession.staff = { name: req.params.name };
+  res.redirect('/');
 });
 
 app.get('/user/:name/:studentNumber/:priority', (req, res) => {
@@ -55,7 +63,7 @@ app.get('/user/:name/:studentNumber/:priority', (req, res) => {
   const student = new Student(req.params.name, req.params.studentNumber, req.params.priority);
   userSession.student = student;
   students[student.getStudentNumber()] = student;
-  res.redirect('/user');
+  res.redirect('/');
 });
 
 io.use(sharedsession(sess, {
@@ -72,14 +80,19 @@ io.on('connection', (socket) => {
     console.log('User disconnected');
   });
 
-  socket.on('removeRequest', () => {
+  socket.on('removeRequest', (studentNumber) => {
     if (socket.handshake.session.student) {
       const studentInstance = students[socket.handshake.session.student.studentNumber];
       queueController.removeStudentFromQueues(studentInstance);
+    } else if (socket.handshake.session.staff && studentNumber != null) {
+      // If the user is staff, allow them to delete any student
 
-      // Notify all users of change
-      io.emit('update', queueController.getQueueObject());
+      const studentInstance = students[studentNumber];
+      queueController.removeStudentFromQueues(studentInstance);
     }
+
+    // Notify all users of change
+    io.emit('update', queueController.getQueueObject());
   });
 
   socket.on('requestHelp', (queueName) => {

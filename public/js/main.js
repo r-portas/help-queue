@@ -39,13 +39,15 @@ var app = new Vue({
      */
     requestHelp(queueName) {
       this.socket.emit('requestHelp', queueName);
+      this.showSnackbar('Request submitted');
     },
 
     /**
      * Removes the help request
      */
-    removeRequest() {
-      this.socket.emit('removeRequest');
+    removeRequest(studentNumber = null) {
+      this.socket.emit('removeRequest', studentNumber);
+      this.showSnackbar('Request cancelled');
     },
 
     /**
@@ -54,26 +56,60 @@ var app = new Vue({
     isMyRequest(request) {
       if (this.user.student) {
         if (request.studentNumber == this.user.student.studentNumber) {
-          console.log('Does belong');
           return true;
         }
+      } else if (this.user.staff) {
+        return true;
       }
 
       return false;
+    },
+
+    /**
+     * Shows a notification through the snackbar
+     */
+    showSnackbar(message) {
+      var sb = this.$refs.snackbar;
+      var data = {
+        message: message,
+      };
+      sb.MaterialSnackbar.showSnackbar(data);
     }
   },
 
   computed: {
-    name() {
-
+    name: function() {
       if (this.user) {
         if (this.user.student) {
           return this.user.student.name;
+        } else if (this.user.staff) {
+          return this.user.staff.name + ' [staff]'; 
         } else {
           return 'Not logged in';
         }
       }
-    }
+    },
+
+    isStaff: function() {
+      if (this.user) {
+        if (this.user.staff) {
+          return true;
+        }
+      }
+      
+      return false;
+    },
+
+    isStudent: function() {
+      if (this.user) {
+        if (this.user.student) {
+          return true;
+        }
+      }
+      
+      return false;
+    } 
+
   },
 
   mounted: function() {

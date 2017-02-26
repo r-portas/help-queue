@@ -9,6 +9,10 @@
     margin: 20px;
 }
 
+.student-request {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
 body {
     background: #f8f8f8;
 }

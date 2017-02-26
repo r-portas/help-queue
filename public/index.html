@@ -30,6 +30,12 @@
                 </div>
             </header>
 
+            <!-- Snackbar -->
+            <div ref="snackbar" class="mdl-snackbar mdl-js-snackbar">
+                <div class="mdl-snackbar__text"></div>
+                <button type="button" class="mdl-snackbar__action"></button>
+            </div>
+
             <main class="mdl-layout__content">
                 <div class="page-content">
 
@@ -41,18 +47,20 @@
                             </div>
                             <div class="mdl-card__supporting-text student-list-div">
                                 <ul class="mdl-list">
-                                    <li v-for="student in queues[queueName]" class="mdl-list__item">
+                                    <li v-for="student in queues[queueName]" class="mdl-list__item student-request">
                                         <span class="mdl-list__item-primary-content">
                                             {{student.name}} - {{student.studentNumber}}
                                         </span>
 
-                                        <a v-if="isMyRequest(student)" v-on:click="removeRequest()">[remove]</a>
+                                        <button v-if="isMyRequest(student)" v-on:click="removeRequest(student.studentNumber)" class="mdl-button mdl-js-button mdl-button--accent">
+                                            cancel
+                                        </button>
                                     </li>
                                 </ul>
                                 
                             </div>
-                            <div class="mdl-card__actions mdl-card--border">
-                                <a v-on:click="requestHelp(queueName)" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                            <div v-if="isStudent" class="mdl-card__actions mdl-card--border">
+                                <a v-on:click="requestHelp(queueName)" class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button mdl-js-ripple-effect">
                                     Request Help
                                 </a>
                             </div>
