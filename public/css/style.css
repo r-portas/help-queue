@@ -1,0 +1,14 @@
+.queues-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: flex-start;
+}
+
+.queues-list > .mdl-card {
+    margin: 20px;
+}
+
+body {
+    background: #f8f8f8;
+}

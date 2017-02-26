@@ -15,6 +15,14 @@ class Student extends PriorityQueueItem {
   getStudentNumber() {
     return this.studentNumber;
   }
+
+  toJSON() {
+    return {
+      name: this.name,
+      studentNumber: this.studentNumber,
+      priority: this.priority
+    };
+  }
 }
 
 module.exports = Student;

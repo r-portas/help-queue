@@ -10,6 +10,7 @@ module.exports = {
   rules: {
     'no-plusplus': 'off',
     'no-console': 'off',
-    'comma-dangle': 'off'
+    'comma-dangle': 'off',
+    'linebreak-style': 'off'
   }
 };

@@ -65,6 +65,8 @@ class QueueController {
 
     if (Object.keys(this.queues).includes(queueName)) {
       this.queues[queueName].add(student);
+    } else {
+      console.log('Warning: Unknown queue given');
     }
   }
 
