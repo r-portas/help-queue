@@ -10,14 +10,13 @@ const express = require('express');
 const session = require('express-session');
 const sharedsession = require('express-socket.io-session');
 const cookieParser = require('cookie-parser');
-const sso = require('uqsso');
+const uqsso = require('uqsso');
 
 const Student = require('./models/student');
 const QueueController = require('./controllers/queueController');
 
 const app = express();
-const http = require('http').Server(app);
-
+const http = require('http').Server(app); 
 const io = require('socket.io')(http);
 
 // Setup the queue controller
@@ -33,15 +32,22 @@ const port = process.env.PORT || 3000;
 
 const sess = session({
   secret: 'Super Secret Session',
-  resave: true
+  resave: true,
+  saveUninitialized: true
 });
 
 app.use(sess);
-app.use(express.static('public'));
+
+io.use(sharedsession(sess, {
+  autoSave: true
+}));
+
+app.use('', express.static('public'));
 
 if (SSO_ENABLED) {
   app.use(cookieParser());
 
+  const sso = uqsso();
   sso.public('^/$');
   app.use(sso);
 }
@@ -50,11 +56,37 @@ if (SSO_ENABLED) {
  * Returns the user data, used by the client
  */
 app.get('/user', (req, res) => {
+  var jsonResponse = {
+    session: null,
+    refresh: req.session
+  };
+
   if (SSO_ENABLED) {
-    console.log(req.user);
+    const userSession = req.session;
+    const username = req.user.name;
+    const studentNumber = req.user.user;
+
+    if (Object.keys(students).includes(studentNumber)) {
+      jsonResponse.refresh = false;
+      jsonResponse.session = req.session;
+      res.json(jsonResponse);
+
+    } else {
+      // Create the new student
+      const student = new Student(username, studentNumber, 1);
+      userSession.student = student;
+      students[student.getStudentNumber()] = student;
+
+      // Update the session
+      jsonResponse.session = req.session;
+      jsonResponse.refresh = true;
+      res.json(jsonResponse);
+    }
+
+  } else {
+    res.json(jsonResponse);
   }
 
-  res.json(req.session);
 });
 
 app.get('/user/staff/:name', (req, res) => {
@@ -71,10 +103,6 @@ app.get('/user/:name/:studentNumber/:priority', (req, res) => {
   students[student.getStudentNumber()] = student;
   res.redirect('/');
 });
-
-io.use(sharedsession(sess, {
-  autoSave: true
-}));
 
 io.on('connection', (socket) => {
   console.log('User connected');
@@ -109,6 +137,9 @@ io.on('connection', (socket) => {
       // Notify all users of change
       io.emit('update', queueController.getQueueObject());
     }
+
+    console.log(socket.handshake.session);
+    console.log('Got request');
   });
 });
 

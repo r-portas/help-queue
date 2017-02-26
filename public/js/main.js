@@ -25,12 +25,17 @@ var app = new Vue({
       request.onreadystatechange = function() {
         if (request.readyState == XMLHttpRequest.DONE) {
           if (request.status == 200) {
-            scope.user = JSON.parse(request.responseText);
+            var data = JSON.parse(request.responseText);
+            scope.user = data.session;
+
+            if (data.refresh) {
+              location.reload();
+            }
           }
         }
       };
 
-      request.open('GET', '/user');
+      request.open('GET', 'user');
       request.send();
     },
 
@@ -81,7 +86,7 @@ var app = new Vue({
     name: function() {
       if (this.user) {
         if (this.user.student) {
-          return this.user.student.name;
+          return this.user.student.name + ' [' + this.user.student.studentNumber + ']';
         } else if (this.user.staff) {
           return this.user.staff.name + ' [staff]'; 
         } else {
@@ -115,7 +120,7 @@ var app = new Vue({
   mounted: function() {
     this.getUser();
 
-    this.socket = io();
+    this.socket = io({path: window.location.pathname + 'socket.io'});
 
     var scope = this;
     this.socket.on('update', function(data) {
